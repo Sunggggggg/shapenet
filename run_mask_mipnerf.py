@@ -23,7 +23,6 @@ from nerf_helper import *
 from MAE import IMAGE, PATCH, mae_input_format, PRO_ENC
 from loss import MAELoss    
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 def train(rank, world_size, args):
     print(f"Local gpu id : {rank}, World Size : {world_size}")
@@ -128,7 +127,7 @@ def train(rank, world_size, args):
         mae_input = args.mae_input
         sampling_pose_function = lambda N : sampling_pose(N)
     
-        i_train = random.sample(list(i_train), nerf_input)
+        i_train = random.sample(i_train, nerf_input)
         # 2. Build MAE (Only Encoder+a part)
         encoder = IMAGE(args, H, W).to(rank)
 
@@ -141,6 +140,7 @@ def train(rank, world_size, args):
             param.requires_grad = False
         
         train_images, train_poses = images[i_train].to(rank), poses[i_train].to(rank)    # [Unmasked_view]
+        print(i_train, train_images.shape)
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
         all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             # [N, 3, H, W]
