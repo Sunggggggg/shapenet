@@ -10,7 +10,11 @@ def config_parser():
     parser.add_argument('--nerf_config', is_config_file=True, help='config file path')
     parser.add_argument("--nerf_weight", type=str, default=None)
     # Dataset
-    parser.add_argument("--datadir", type=str, default='/home/dev4/data/SKY/datasets/NMR_Dataset')
+    parser.add_argument("--datadir", type=str, default='/mnt2/SKY/dataset/nerf_synthetic/lego')
+    parser.add_argument("--dataset_type", type=str, default='blender')
+    parser.add_argument('--scale', default=4, type=int)
+    parser.add_argument("--testskip", type=int, default=8)
+    parser.add_argument("--llff_train_views", type=int, nargs="+", default=[])
     # Optimizer and scheduler
     parser.add_argument("--lr_init", type=float, default=1e-3)      # 0.001    
     parser.add_argument("--weight_decay", type=float, default=1e-5) 
@@ -45,12 +49,11 @@ def config_parser():
     parser.add_argument("--viewdirs_min_deg", type=int, default=0)
     parser.add_argument("--viewdirs_max_deg", type=int, default=4)
     # Few-shot
-    parser.add_argument("--nerf_input", type=int, default=1)
-    parser.add_argument("--mae_input", type=int, default=20)
+    parser.add_argument("--nerf_input", type=int, default=8)
+    parser.add_argument("--mae_input", type=int, default=25)
     # MAE
     parser.add_argument('--mae_config', is_config_file=True, help='config file path')
     parser.add_argument("--mae_weight", type=str, default=None)
-    parser.add_argument("--mae_poses", type=str, default=None)
     parser.add_argument("--emb_type", type=str, default="IMAGE")        # OR "PATCH"
     parser.add_argument("--image_token", type=int, default=16)
     parser.add_argument("--cam_pose_encoding", action='store_true')
@@ -59,17 +62,17 @@ def config_parser():
     parser.add_argument('--depth', type=int, default=24)
     parser.add_argument('--num_heads', type=int, default=16)
     parser.add_argument('--decoder_embed_dim', type=int, default=512)
-    parser.add_argument('--decoder_depth',type=int, default=8)
+    parser.add_argument('--decoder_depth',type=int, default=8, )
     parser.add_argument('--decoder_num_heads', type=int,default=16)
     # MAE (loss)
     parser.add_argument("--mae_loss_func", type=str, default="COSINE")  # OR "PERCE"
-    parser.add_argument("--loss_lam_c", type=float, default=2.0)        
-    parser.add_argument("--loss_lam_f", type=float, default=2.0)        
+    parser.add_argument("--loss_lam_c", type=float, default=2.0)         # loss_lam_f * 0.1
+    parser.add_argument("--loss_lam_f", type=float, default=2.0)        # 
     # logging/saving options
     parser.add_argument("--i_print", type=int, default=10)
     parser.add_argument("--i_weights", type=int, default=100)
     parser.add_argument("--i_testset", type=int, default=100)
-    parser.add_argument("--i_video",   type=int, default=1000)
+    parser.add_argument("--i_video",   type=int, default=10000)
     
     return parser
 
