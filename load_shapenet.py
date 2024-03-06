@@ -81,17 +81,17 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
         [1, 0, 0, 0], 
         [0, 0, -1, 0], 
         [0, 1, 0, 0], 
-        [0, 0, 0, 1]], dtype=torch.cuda.FloatTensor)
+        [0, 0, 0, 1]], dtype=torch.float64)
 
         _coord_trans_cam = torch.tensor([
             [1, 0, 0, 0], 
             [0, -1, 0, 0], 
             [0, 0, -1, 0], 
-            [0, 0, 0, 1]], dtype=torch.cuda.FloatTensor)
+            [0, 0, 0, 1]], dtype=torch.float64)
         
-        pose = (_coord_trans_world @ torch.tensor(pose, dtype=torch.cuda.FloatTensor) @ _coord_trans_cam)    # c2w
+        pose = (_coord_trans_world @ torch.tensor(pose, dtype=torch.float64) @ _coord_trans_cam)    # c2w
         
-        img_tensor = image_to_tensor(img).type(torch.cuda.FloatTensor)
+        img_tensor = image_to_tensor(img)
         mask_tensor = mask_to_tensor(mask)
 
         rows = np.any(mask, axis=1) # [H, 1]
