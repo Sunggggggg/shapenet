@@ -127,7 +127,7 @@ def train(rank, world_size, args):
         mae_input = args.mae_input
         sampling_pose_function = lambda N : sampling_pose(N)
     
-        i_train = random.sample(i_train, nerf_input)
+        i_train = random.sample(list(i_train), nerf_input)
         # 2. Build MAE (Only Encoder+a part)
         encoder = IMAGE(args, H, W).to(rank)
 
