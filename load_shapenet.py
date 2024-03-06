@@ -121,8 +121,10 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
     """
     # Choose expriment
     if exp == 1 :
+        cats = []
         fix_cats = ["02958343", "03001627"]     # [car, chair]
-        cats = [x for x in os.path.join(path, fix_cats) if os.path.isdir(x)]
+        for i in fix_cats :
+            cats.extend(list(glob.glob(os.path.join(path, i))))
     if exp == 2:
         cats = [x for x in glob.glob(os.path.join(path, "*")) if os.path.isdir(x)]
 
