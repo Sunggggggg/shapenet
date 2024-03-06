@@ -34,10 +34,10 @@ def train(rank, world_size, args):
     rgb_paths = [x for x in glob.glob(os.path.join(data_dir, 'image', '*'))
                     if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input]
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))
-                if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input] # 0, 1, 2, 3, 4
+                if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input] # 0, 1, 2, 3
     cam_path = os.path.join(data_dir, "cameras.npz")
-    i_train = np.arange(0, 25-args.mae_input)
-    i_test = np.arange(2, 5)
+    i_train = np.arange(0, 2)
+    i_test = np.arange(2, 4)
 
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
                                                    mask_paths=mask_paths,
@@ -52,12 +52,11 @@ def train(rank, world_size, args):
     H, W = int(H), int(W)
     hwf = [H, W, focal]
 
-    if K is None:
-        K = np.array([
-            [focal, 0, 0.5*W],
-            [0, focal, 0.5*H],
-            [0, 0, 1]
-        ])
+    K = np.array([
+        [focal, 0, 0.5*W],
+        [0, focal, 0.5*H],
+        [0, 0, 1]
+    ])
     
     # Create log dir and copy the config file
     basedir = args.basedir

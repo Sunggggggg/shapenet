@@ -1,7 +1,7 @@
 ["02958343", "03001627"]     # [car, chair]
-0, 1    : NeRF 
-2,3,4   : Test
-5~24    : MAE
+0,1     : NeRF  2
+2,3     : Test  2
+4~23    : MAE   23-4+1 = 20
 # car
 /home/dev4/data/SKY/datasets/NMR_Dataset/02958343/10247b51a42b41603ffe0e5069bf1eb5
 /home/dev4/data/SKY/datasets/NMR_Dataset/02958343/1047f2879c7fdcb5709a6634bf501a9e
