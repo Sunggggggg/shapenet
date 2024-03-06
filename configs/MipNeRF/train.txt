@@ -1,6 +1,6 @@
 # 
 expname = Test
-basedir = /home/dev4/data/SKY/datasets/NMR_Dataset/02958343/10247b51a42b41603ffe0e5069bf1eb5
+data_dir = /home/dev4/data/SKY/datasets/NMR_Dataset/02958343/10247b51a42b41603ffe0e5069bf1eb5
 
 # 
 max_iters = 5000
