@@ -20,5 +20,5 @@ decoder_num_heads = 4
 #
 epochs = 10001
 i_print = 10
-i_figure = 1000
+i_figure = 100
 i_weight = 1000
