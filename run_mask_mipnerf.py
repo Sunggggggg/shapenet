@@ -30,7 +30,7 @@ def train(rank, world_size, args):
     
     # Load dataset
     near, far = 1.2, 4.0
-    data_dir=args.datadir
+    data_dir=args.data_dir
     rgb_paths = [x for x in glob.glob(os.path.join(data_dir, 'image', '*'))
                     if (x.endswith('.jpg') or x.endswith('.png'))][:24-args.mae_input]
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))

@@ -10,7 +10,7 @@ def config_parser():
     parser.add_argument('--nerf_config', is_config_file=True, help='config file path')
     parser.add_argument("--nerf_weight", type=str, default=None)
     # Dataset
-    parser.add_argument("--datadir", type=str, default='/mnt2/SKY/dataset/nerf_synthetic/lego')
+    parser.add_argument("--data_dir", type=str, default='/home/dev4/data/SKY/datasets/NMR_Dataset/02958343/10247b51a42b41603ffe0e5069bf1eb5')
     parser.add_argument("--dataset_type", type=str, default='shapenet')
     parser.add_argument('--scale', default=4, type=int)
     parser.add_argument("--testskip", type=int, default=8)
