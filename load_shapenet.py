@@ -82,12 +82,13 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
         [0, 0, -1, 0], 
         [0, 1, 0, 0], 
         [0, 0, 0, 1]], dtype=torch.float32)
-        
+
         _coord_trans_cam = torch.tensor([
             [1, 0, 0, 0], 
             [0, -1, 0, 0], 
             [0, 0, -1, 0], 
             [0, 0, 0, 1]], dtype=torch.float32)
+        
         pose = (_coord_trans_world @ torch.tensor(pose, dtype=torch.float32) @ _coord_trans_cam)    # c2w
 
         img_tensor = image_to_tensor(img)
@@ -103,13 +104,12 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
             )
         rmin, rmax = rnz[[0, -1]]
         cmin, cmax = cnz[[0, -1]]
-        bbox = torch.tensor([cmin, rmin, cmax, rmax], dtype=torch.float32)
 
         all_imgs.append(img_tensor)
         all_poses.append(pose)
 
-    imgs = np.stack(all_imgs, 0)
-    poses = np.stack(all_poses, 0)
+    imgs = torch.stack(all_imgs, 0)
+    poses = torch.stack(all_poses, 0)
 
     render_poses = torch.stack([pose_spherical(angle, -30.0, 2.7) for angle in np.linspace(-180,180,40+1)[:-1]], 0)
 
@@ -179,7 +179,7 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
         train_imgs.append(imgs)          # [N, H, W, 3]
         train_poses.append(poses)        # [N, 4, 4]
 
-    train_imgs = np.stack(train_imgs, 0)      # [O, N, H, W, 3]    
-    train_poses = np.stack(train_poses, 0)    # [O, N, 4, 4]
+    train_imgs = torch.stack(train_imgs, 0)      # [O, N, H, W, 3]    
+    train_poses = torch.stack(train_poses, 0)    # [O, N, 4, 4]
 
     return train_imgs, train_poses, hwf, object_list
