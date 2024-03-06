@@ -23,6 +23,8 @@ from nerf_helper import *
 from MAE import IMAGE, PATCH, mae_input_format, PRO_ENC
 from loss import MAELoss    
 
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
+
 def train(rank, world_size, args):
     print(f"Local gpu id : {rank}, World Size : {world_size}")
     set_ddp(rank, world_size)
