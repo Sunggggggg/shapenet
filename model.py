@@ -130,6 +130,7 @@ class MipNeRF(nn.Module):
         radii = torch.reshape(ray_batch[..., 8], [-1, 1])                   # [N_rays, 1]
         view_dirs = ray_batch[:,-3:] if ray_batch.shape[-1] > 9 else None   # [N_rays, 3]
         
+        print(rays_o.shape, near.shape, radii.shape, view_dirs.shape)
         for l in range(self.num_levels):
             # sample
             if l == 0:
@@ -148,7 +149,7 @@ class MipNeRF(nn.Module):
                 N_samples = N_samples * 2 + 1
 
             # do integrated positional encoding of samples
-            print(mean.shape, var.shape)
+            
             samples_enc = self.positional_encoding(mean, var)[0]
             samples_enc = samples_enc.reshape([-1, samples_enc.shape[-1]])  # [N_rays*N_samples, 96]
 
