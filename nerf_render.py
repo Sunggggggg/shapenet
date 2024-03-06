@@ -41,7 +41,6 @@ def render_mipnerf(H, W, K, chunk=1024*16, netchunk=1024*32,
         rays = torch.cat([rays, viewdirs], -1)          # (H*W, 3 + 3 + 1 + 1 + 1 + 3)
     
     all_comp_rgbs, all_distances, all_accs = [], [], []
-    print(rays.shape)
     for i in range(0, rays.shape[0], chunk):
         comp_rgbs, distances, accs = mipnerf(rays[i:i+chunk])
         all_comp_rgbs.append(comp_rgbs)     # [2, chunk, 3]
