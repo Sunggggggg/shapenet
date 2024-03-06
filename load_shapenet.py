@@ -130,7 +130,7 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
 
     # Split
     if stage == "train":
-        file_lists = [os.path.join(x,"mae_train.lst") for x in cats]
+        file_lists = [os.path.join(x, "mae_train.lst") for x in cats]
     elif stage == "val":
         file_lists = [os.path.join(x, "mae_val.lst") for x in cats]
     elif stage == "test":
