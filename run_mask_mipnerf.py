@@ -35,11 +35,13 @@ def train(rank, world_size, args):
                     if (x.endswith('.jpg') or x.endswith('.png'))][:24-args.mae_input]
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))
                 if (x.endswith('.jpg') or x.endswith('.png'))][:24-args.mae_input]
+    cam_path = os.path.join(data_dir, "cameras.npz")
     i_train = np.arange(0, 2)
     i_test = np.arange(2, 5)
 
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
                                                    mask_paths=mask_paths,
+                                                   cam_path=cam_path,
                                                    sel_indices=i_train,
                                                    scale_focal=False)
     
