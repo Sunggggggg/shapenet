@@ -14,7 +14,6 @@ def image_plot(images, emb_type='IMAGE', row=5, save_fig=None):
     images = tensor2img(images.permute(1, 2, 3, 0)) # numpy [N, H, W, 3]
 
     N = images.shape[0]
-    print(N, row)
     col = int(N / row)
     assert N == row*col, f"Check row and col {row}, {col}"
 
