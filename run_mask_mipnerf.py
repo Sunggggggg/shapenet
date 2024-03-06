@@ -32,19 +32,21 @@ def train(rank, world_size, args):
     near, far = 1.2, 4.0
     data_dir=args.data_dir
     rgb_paths = [x for x in glob.glob(os.path.join(data_dir, 'image', '*'))
-                    if (x.endswith('.jpg') or x.endswith('.png'))][:24-args.mae_input]
+                    if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input]
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))
-                if (x.endswith('.jpg') or x.endswith('.png'))][:24-args.mae_input]
+                if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input] # 0, 1, 2, 3, 4
     cam_path = os.path.join(data_dir, "cameras.npz")
-    i_train = np.arange(0, 2)
+    i_train = np.arange(0, 25-args.mae_input)
     i_test = np.arange(2, 5)
 
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
                                                    mask_paths=mask_paths,
                                                    cam_path=cam_path,
-                                                   sel_indices=i_train,
+                                                   sel_indices=np.arange(0, 25-args.mae_input),
                                                    scale_focal=False)
-    
+    print("Total images : ", images.shape)
+    print(i_train, i_test)
+
     # Cast intrinsics to right types
     H, W, focal = hwf
     H, W = int(H), int(W)
