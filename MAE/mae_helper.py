@@ -21,7 +21,7 @@ def make_input(imgs, fig_path, object_list, n=5, save_fig=True):
 def mae_input_format(imgs, poses, mae_input, emb_type='IMAGE'):
     """ NeRF input format with MAE input format (F = nerf_input / N = mae_input)
     args
-    imgs  (torch) [F, H, W, 3]
+    imgs  (torch) [F, 3, H, W]
     poses (torch) [F, 4, 4] 
 
     return
@@ -33,7 +33,7 @@ def mae_input_format(imgs, poses, mae_input, emb_type='IMAGE'):
         imgs        [B, 3, Hxn, Wxn]
         poses       [B, N, 4, 4] 
     """
-    imgs = imgs.permute(3, 0, 1, 2).unsqueeze(0)    # [1, 3, N, H, W]
+    imgs = imgs.permute(1, 0, 2, 3).unsqueeze(0)    # [1, 3, N, H, W]
     poses = poses.unsqueeze(0)                      # [1, N, 4, 4]
 
     return imgs, poses

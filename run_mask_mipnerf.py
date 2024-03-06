@@ -42,7 +42,7 @@ def train(rank, world_size, args):
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
                                                    mask_paths=mask_paths,
                                                    cam_path=cam_path,
-                                                   sel_indices=np.arange(0, 25-args.mae_input),
+                                                   sel_indices=np.arange(0, 4),
                                                    scale_focal=False)
     print("Total images : ", images.shape)
     print(i_train, i_test)
@@ -141,8 +141,8 @@ def train(rank, world_size, args):
         train_images, train_poses = images[i_train].to(rank), poses[i_train].to(rank)    # [Unmasked_view]
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
-        all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             #
-        all_view_images = torch.cat([train_images, masked_view_images], 0)          # 
+        all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             # [N, 3, H, W]
+        all_view_images = torch.cat([train_images, masked_view_images], 0)          # [N, 4, 4] 
         print(all_view_images.shape, all_view_poses.shape)
 
         mae_input_images, mae_input_poses = mae_input_format(all_view_images, all_view_poses, mae_input, args.emb_type)
