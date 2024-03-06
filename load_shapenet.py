@@ -38,17 +38,6 @@ mask_to_tensor = transforms.Compose([
     transforms.ToTensor(), transforms.Normalize((0.0,), (1.0, ))
 ])
 
-_coord_trans_world = torch.tensor([
-        [1, 0, 0, 0], 
-        [0, 0, -1, 0], 
-        [0, 1, 0, 0], 
-        [0, 0, 0, 1]], dtype=torch.float32)
-_coord_trans_cam = torch.tensor([
-    [1, 0, 0, 0], 
-    [0, -1, 0, 0], 
-    [0, 0, -1, 0], 
-    [0, 0, 0, 1]], dtype=torch.float32)
-
 def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=False,):
     all_imgs, all_poses, all_masks, all_bboxes = [],[],[],[]
     focal = None
@@ -88,6 +77,17 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
             assert abs(fx - focal) < 1e-5
         pose = extr_inv_mtx     # [4, 4]
 
+        _coord_trans_world = torch.tensor([
+        [1, 0, 0, 0], 
+        [0, 0, -1, 0], 
+        [0, 1, 0, 0], 
+        [0, 0, 0, 1]], dtype=torch.float32)
+        
+        _coord_trans_cam = torch.tensor([
+            [1, 0, 0, 0], 
+            [0, -1, 0, 0], 
+            [0, 0, -1, 0], 
+            [0, 0, 0, 1]], dtype=torch.float32)
         pose = (_coord_trans_world @ torch.tensor(pose, dtype=torch.float32) @ _coord_trans_cam)    # c2w
 
         img_tensor = image_to_tensor(img)
