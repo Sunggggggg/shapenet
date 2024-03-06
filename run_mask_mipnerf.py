@@ -18,7 +18,7 @@ from loss import MipNeRFLoss
 from model import MipNeRF
 #
 from nerf_render import *
-from nerf_render import *
+from nerf_helper import *
 #
 from MAE import IMAGE, PATCH, mae_input_format, PRO_ENC
 from loss import MAELoss    
@@ -138,7 +138,7 @@ def train(rank, world_size, args):
         for param in encoder.parameters():
             param.requires_grad = False
         
-        train_images, train_poses = torch.tensor(images[i_train]), torch.tensor(poses[i_train])     # [Unmasked_view]
+        train_images, train_poses = images[i_train], poses[i_train]    # [Unmasked_view]
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
         all_view_poses = torch.cat([train_poses, masked_view_poses], 0)
@@ -157,23 +157,19 @@ def train(rank, world_size, args):
 
     # Move training data to GPU
     model.train()
-    N_rays_o, N_rays_d = get_rays_np_dtu(H, W, p2c, c2w)    # [N, H, W, 3]
-    
-    p2c = torch.Tensor(p2c).to(rank)
-    c2w = torch.Tensor(c2w).to(rank)
+    poses = torch.Tensor(poses).to(rank)
+    render_poses = torch.Tensor(render_poses).to(rank)
 
-    # Train
     for i in trange(start, max_iters):
         # 1. Random select image
         img_i = np.random.choice(i_train)
-        target = torch.Tensor(images[img_i]).to(rank)
+        pose = poses[img_i, :3,:4]
+        target = images[img_i]
 
+        target = torch.Tensor(target).to(rank)
+        pose = torch.Tensor(pose).to(rank)
         # 2. Generate rays
-        rays_o, rays_d = N_rays_o[img_i], N_rays_d[img_i]
-        rays_o = torch.tensor(rays_o)
-        rays_d = torch.tensor(rays_d)
-        rays_o = shift_origins(rays_o, rays_d, 0.0)
-
+        rays_o, rays_d = get_rays(H, W, K, pose)
         radii = get_radii(rays_d)
         
         # 3. Random select rays
@@ -201,8 +197,9 @@ def train(rank, world_size, args):
         target = target[select_coords[:, 0], select_coords[:, 1]]     # (N_rand, 3)
         
         # 4. Rendering 
-        comp_rgbs, _, _ = render_mipnerf(H, W, p2c[img_i], chunk=args.chunk, mipnerf=model, 
-                                         rays=batch_rays, radii=radii, near=near, far=far, use_viewdirs=args.use_viewdirs)
+        comp_rgbs, _, _ = render_mipnerf(H, W, K, chunk=args.chunk, netchunk=args.netchunk,
+                                        mipnerf=model, rays=batch_rays, radii=radii, near=near, far=far,
+                                        use_viewdirs=args.use_viewdirs, ndc=args.no_ndc)
         
         # 5. loss and update
         loss, (mse_loss_c, mse_loss_f), (train_psnr_c, train_psnr_f) = loss_func(comp_rgbs, target, lossmult.to(rank))
@@ -212,7 +209,7 @@ def train(rank, world_size, args):
             if i == 1 or i % 30 == 0 :
                 sampled_poses = sampling_pose_function(nerf_input)
                 sampled_poses = torch.cat([sampled_poses, masked_view_poses], 0)
-                rgbs = render_path(sampled_poses.to(rank), hwf, K, args.chunk, model, 
+                rgbs = render_sample_path(sampled_poses.to(rank), hwf, K, args.chunk, model, 
                                     near=near, far=far, use_viewdirs=args.use_viewdirs, no_ndc=args.no_ndc, progress_bar=True) # [N, 2, H, W, 3]
                 rgbs = torch.tensor(rgbs)
                 rgbs_c, rgbs_f = rgbs[:, 0], rgbs[:, 1]
@@ -254,11 +251,11 @@ def train(rank, world_size, args):
             if i%args.i_testset==0 and i > 0:
                 testsavedir = os.path.join(basedir, expname, 'testset_{:06d}'.format(i))
                 os.makedirs(testsavedir, exist_ok=True)
-                print('test poses shape', c2w[i_test].shape)
+                print('test poses shape', poses[i_test].shape)
                 with torch.no_grad():
-                    rgbs = render_path(c2w[i_test], H, W, p2c[i_test], args.chunk, model, 
-                                        near=near, far=far, use_viewdirs=args.use_viewdirs, 
-                                        savedir=testsavedir)
+                    rgbs = render_path(poses[i_test], hwf, K, args.chunk, model, 
+                                    near=near, far=far, use_viewdirs=args.use_viewdirs, no_ndc=args.no_ndc, 
+                                    gt_imgs=images[i_test], savedir=testsavedir)
                     eval_psnr, eval_ssim, eval_lpips = get_metric(rgbs[:, -1], images[i_test], None, torch.device(rank))    # Use fine model
     
                 with open(logdir, 'a') as file :

@@ -21,36 +21,29 @@ def get_radii(rays_d):
 
     return radii
 
-def get_rays_dtu(H, W, p2c, c2w):
+def get_rays(H, W, K, c2w):
+    """ All rays from origin, rays_o, rays_d is dir vectors
     """
-    p2c : [3, 3]
-    c2w : [3, 4]
-    """
-    i, j = torch.meshgrid(torch.arange(W) + 0.5, torch.arange(H) + 0.5)
+    device = c2w.device
+
+    i, j = torch.meshgrid(torch.linspace(0, W-1, W), torch.linspace(0, H-1, H))
     i = i.t()
     j = j.t()
-
-    ray_dirs = torch.stack([i, j, torch.ones_like(i)], -1)           # [H, W, 3]
-    cam_dirs = ray_dirs @ p2c.T                                      # [H, W, 3] * [3, 3]
-    rays_d = torch.sum(cam_dirs[..., None, :] * c2w[:3, :3], -1)     # 
-    rays_o = c2w[:3,-1].expand(rays_d.shape)               
-
+    dirs = torch.stack([(i-K[0][2])/K[0][0], -(j-K[1][2])/K[1][1], -torch.ones_like(i)], -1).to(device)
+    rays_d = torch.sum(dirs[..., np.newaxis, :] * c2w[:3,:3], -1)  # dot product, equals to: [c2w.dot(dir) for dir in dirs]
+    rays_o = c2w[:3,-1].expand(rays_d.shape)
     return rays_o, rays_d
 
-def get_rays_np_dtu(H, W, p2c, c2w):
+def get_rays_np(H, W, K, c2w):
+    """ All rays from origin, rays_o, rays_d is dir
     """
-    p2c : [N, 3, 3]
-    c2w : [N, 3, 4]
-    """
-    x, y = np.meshgrid(np.arange(W, dtype=np.float32) + .5, np.arange(H, dtype=np.float32) + .5, indexing='xy')
-    
-    ray_dirs = np.stack([x, y, np.ones_like(x)], axis=-1)   # [H, W, 3]
-    cam_dirs = np.stack([ray_dirs @ c.T for c in p2c])      # [N, H, W, 3]
-    directions = np.stack([v @ c2w[:3, :3].T for (v, c2w) in zip(cam_dirs, c2w)]) # [N, H, W, 3]
-    origins = np.broadcast_to(c2w[:, None, None, :3, 3], directions.shape)        # [N, 1, 1, 3] -> [N, H, W, 3]
-    viewdirs = directions / np.linalg.norm(directions, axis=-1, keepdims=True)
-
-    return origins, viewdirs
+    i, j = np.meshgrid(np.arange(W, dtype=np.float32), np.arange(H, dtype=np.float32), indexing='xy')
+    dirs = np.stack([(i-K[0][2])/K[0][0], -(j-K[1][2])/K[1][1], -np.ones_like(i)], -1)
+    # Rotate ray directions from camera frame to the world frame
+    rays_d = np.sum(dirs[..., np.newaxis, :] * c2w[:3,:3], -1)  # dot product, equals to: [c2w.dot(dir) for dir in dirs]
+    # Translate camera frame's origin to the world frame. It is the origin of all rays.
+    rays_o = np.broadcast_to(c2w[:3,-1], np.shape(rays_d))
+    return rays_o, rays_d
 
 def lift_gaussian(d, t_mean, t_var, r_var, diag):
     """Lift a Gaussian defined along a ray to 3D coordinates.
