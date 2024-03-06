@@ -41,7 +41,7 @@ def train(rank, world_size, args):
 
     # load dataset
     train_imgs, train_poses, hwf, object_list = \
-        load_nerf_shapenet_data(args.basedir, mae_input=args.mae_input, stage='train', exp= 1, sel_fix=args.random_idx, scale_focal=False)
+        load_nerf_shapenet_data(args.datadir, mae_input=args.mae_input, stage='train', exp= 1, sel_fix=args.random_idx, scale_focal=False)
 
     print("Data load shape")
     print(f"image shape {train_imgs.shape}")
