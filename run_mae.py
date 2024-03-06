@@ -57,7 +57,7 @@ def train(rank, world_size, args):
         dir_path = os.path.join(fig_path, object_list[idx])
         os.makedirs(dir_path, exist_ok=True)
 
-    train_imgs = make_input(train_imgs, args.emb_type, fig_path, object_list, 5)     # [B, 3, N, H, W]
+    train_imgs = make_input(train_imgs, fig_path, object_list, n=5)     # [B, 3, N, H, W]
 
     # Model build
     if args.emb_type == "IMAGE" :
