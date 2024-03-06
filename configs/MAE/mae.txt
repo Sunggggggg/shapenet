@@ -1,8 +1,8 @@
 # Few-shot
-mae_input = 25
+mae_input = 20
 
 # MAE
-mae_weight = weights/MAE/mae_weight.tar
+mae_weight = mae_logs/shapenet/weights/mae_weight.tar
 emb_type = IMAGE
 image_token = 16
 cam_pose_encoding = True

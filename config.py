@@ -11,7 +11,7 @@ def config_parser():
     parser.add_argument("--nerf_weight", type=str, default=None)
     # Dataset
     parser.add_argument("--datadir", type=str, default='/mnt2/SKY/dataset/nerf_synthetic/lego')
-    parser.add_argument("--dataset_type", type=str, default='blender')
+    parser.add_argument("--dataset_type", type=str, default='shapenet')
     parser.add_argument('--scale', default=4, type=int)
     parser.add_argument("--testskip", type=int, default=8)
     parser.add_argument("--llff_train_views", type=int, nargs="+", default=[])
