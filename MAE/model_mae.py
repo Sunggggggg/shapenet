@@ -135,7 +135,8 @@ class MaskedAutoencoderViT(nn.Module):
         
         # Positional encoding
         if self.cam_pose_encoding :
-            pos_embed = get_3d_sincos_pos_embed(poses, x.shape[-1], True).to(x.device)
+            theta, phi = matrix2angle(poses)
+            pos_embed = view_sinusoid_encoding(theta, phi, x.shape[-1], True).to(x.device)
         else :
             B, N, D =x.shape
             n = int(N**.5)
@@ -170,7 +171,8 @@ class MaskedAutoencoderViT(nn.Module):
         x = torch.cat([x[:, :1, :], x_], dim=1)
         
         if self.cam_pose_encoding :
-            decoder_pos_embed = get_3d_sincos_pos_embed(poses, x.shape[-1], True).to(x.device)
+            theta, phi = matrix2angle(poses)
+            decoder_pos_embed = view_sinusoid_encoding(theta, phi, x.shape[-1], True).to(x.device)
         else :
             B, N, D =x.shape
             n = int(N**.5)  
