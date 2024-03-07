@@ -17,6 +17,8 @@ do
     data_dir=${data_dirs[idx]}
     nerf_config=configs/MipNeRF/train.txt
     mae_config=configs/MAE/mae.txt
-    
+
+    echo $expname
+    echo $data_dir
     python run_mask_mipnerf.py --nerf_config $nerf_config --mae_config $mae_config --expname $expname --data_dir $data_dir
 done
