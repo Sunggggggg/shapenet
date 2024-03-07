@@ -182,7 +182,7 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
 
     return train_imgs, train_poses, hwf, object_list
 
-def sampling_pose(N, theta_range=[-180.+1.,180.-1.], phi_range=[-90., 0.], radius_range=[2.7, 3.0]) :
+def sampling_pose(N, theta_range=[-180.+1.,180.-1.], phi_range=[-90., 0.], radius_range=[2.7, 3.0], device='cuda:0') :
     """ sampling with sorting angle
     """
     theta = np.random.uniform(*theta_range, N)
@@ -190,5 +190,6 @@ def sampling_pose(N, theta_range=[-180.+1.,180.-1.], phi_range=[-90., 0.], radiu
     radius = np.random.uniform(*radius_range, N)
 
     render_poses = torch.stack([pose_spherical(theta[i], phi[i], radius[i]) for i in range(N)], 0)    # [N, 4, 4]
-    
+    render_poses = torch.Tensor(render_poses).to(device)
+        
     return render_poses
