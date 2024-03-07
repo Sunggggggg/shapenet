@@ -151,8 +151,10 @@ def train(rank, world_size, args):
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
         all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             # [N, 3, H, W]
+        print(all_view_poses.dtype, train_poses.dtype, masked_view_poses.dtype)
+        print(train_images.dtype, masked_view_images.dtype)
         all_view_images = torch.cat([train_images, masked_view_images], 0)          # [N, 4, 4] 
-
+        
         mae_input_images, mae_input_poses = mae_input_format(all_view_images, all_view_poses, mae_input, args.emb_type)
         mae_input_images = mae_input_images.type(torch.cuda.FloatTensor).to(rank)      # [1, 3, N, H, W]
         mae_input_poses = mae_input_poses.type(torch.cuda.FloatTensor).to(rank)        # [1, N, 4, 4]   N=mae_input
