@@ -21,7 +21,7 @@ class PositionalEncoding(nn.Module):
         x_ret : [B, N, E]      (max_deg-min_deg)*(sin, cos)*(x,y,z) = E
         y_ret : [B, N, E]
         '''
-        print(x.shape, y)
+
         shape = list(x.shape[:-1]) + [-1]   # [B, N, -1]
         x_enc = (x[..., None, :] * self.scales[:, None]).reshape(shape) # [B, N, L, 3] -> [B, N, 3L] 
         x_enc = torch.cat((x_enc, x_enc + 0.5 * torch.pi), -1)          # [B, N, 6L]
