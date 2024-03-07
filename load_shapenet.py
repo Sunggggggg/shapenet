@@ -87,9 +87,9 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
                                                 [0, -1, 0, 0], 
                                                 [0, 0, -1, 0], 
                                                 [0, 0, 0, 1]]))
-        pose = (coord_trans_world @ torch.Tensor(pose).float() @ coord_trans_cam)    # c2w
+        pose = (coord_trans_world @ torch.Tensor(pose).type(torch.float32) @ coord_trans_cam)    # c2w
         
-        img_tensor = image_to_tensor(img).type(torch.float64)
+        img_tensor = image_to_tensor(img).type(torch.float32)
         mask_tensor = mask_to_tensor(mask)
 
         rows = np.any(mask, axis=1) # [H, 1]
