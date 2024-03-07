@@ -12,9 +12,7 @@ def config_parser():
     # Dataset
     parser.add_argument("--data_dir", type=str, default='/home/dev4/data/SKY/datasets/NMR_Dataset/02958343/10247b51a42b41603ffe0e5069bf1eb5')
     parser.add_argument("--dataset_type", type=str, default='shapenet')
-    parser.add_argument('--scale', default=4, type=int)
-    parser.add_argument("--testskip", type=int, default=8)
-    parser.add_argument("--llff_train_views", type=int, nargs="+", default=[])
+    parser.add_argument('--rand', action='store_true', default=False)
     # Optimizer and scheduler
     parser.add_argument("--lr_init", type=float, default=1e-3)      # 0.001    
     parser.add_argument("--weight_decay", type=float, default=1e-5) 

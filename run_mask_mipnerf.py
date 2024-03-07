@@ -37,13 +37,25 @@ def train(rank, world_size, args):
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))
                 if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input] # 0, 1, 2, 3
     cam_path = os.path.join(data_dir, "cameras.npz")
-    i_train = [0, 11]
-    i_test = [x for x in np.arange(24-args.mae_input) if x not in i_train]
+    
+    # 10shot
+    if args.nerf_input == 10:
+        i_train = [0, 11]
+        i_test = [x for x in np.arange(24-args.mae_input) if x not in i_train]
+
+    # 20shot
+    if args.nerf_input == 20 :
+        i_train = [0, 3]
+        i_test = [x for x in np.arange(24-args.mae_input) if x not in i_train]
+
+    if args.rand :
+        i_train = random.sample(list(i_train), args.nerf_input)
+        i_test = [x for x in np.arange(24) if x not in i_train]
 
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
                                                    mask_paths=mask_paths,
                                                    cam_path=cam_path,
-                                                   sel_indices=np.arange(0, 24-args.mae_input),
+                                                   sel_indices=np.arange(0, 24),
                                                    scale_focal=False)
     i_train = np.array(i_train)
     i_test = np.array(i_test)
