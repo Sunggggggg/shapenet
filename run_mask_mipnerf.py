@@ -146,10 +146,10 @@ def train(rank, world_size, args):
         for param in encoder.parameters():
             param.requires_grad = False
         
-        print(images.device)
+        print(images.device, images.dtype)
         train_images, train_poses = images[i_train].to(rank), poses[i_train].to(rank)    # [Unmasked_view]
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
-        print(masked_view_poses.device)
+        print(masked_view_poses.device, masked_view_poses.dtype, train_images.device, train_images.dtype)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
         all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             # [N, 3, H, W]
         all_view_images = torch.cat([train_images, masked_view_images], 0)          # [N, 4, 4] 
