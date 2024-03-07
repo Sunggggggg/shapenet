@@ -30,13 +30,15 @@ def pose_spherical(theta, phi, radius):
     c2w = torch.Tensor(np.array([[-1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]])) @ c2w
     return c2w
 
+coord_trans_world = np.array([[1, 0, 0, 0], 
+                             [0, 0, -1, 0], 
+                             [0, 1, 0, 0], 
+                             [0, 0, 0, 1]])
 
-image_to_tensor = transforms.Compose([
-        transforms.ToTensor(), transforms.Normalize((0.0,), (1.0, ))
-    ])
-mask_to_tensor = transforms.Compose([
-    transforms.ToTensor(), transforms.Normalize((0.0,), (1.0, ))
-])
+coord_trans_cam = np.array([[1, 0, 0, 0], 
+                            [0, -1, 0, 0], 
+                            [0, 0, -1, 0], 
+                            [0, 0, 0, 1]])
 
 def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=False,):
     all_imgs, all_poses, all_masks, all_bboxes = [],[],[],[]
@@ -46,6 +48,8 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
         i = sel_indices[idx]                             # 절대 idx
         img = imageio.imread(rgb_path)[..., :3]          # [H, W, 3]
         mask = imageio.imread(mask_path)[..., :1]        # [H, W, 3]
+
+        img = (np.array(img)/255.).astype(np.float32)
 
         H, W = img.shape[:2]
         if scale_focal:
@@ -77,39 +81,15 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
             assert abs(fx - focal) < 1e-5
         pose = extr_inv_mtx     # [4, 4]
         
-
-        coord_trans_world = torch.Tensor(np.array([[1, 0, 0, 0], 
-                                           [0, 0, -1, 0], 
-                                           [0, 1, 0, 0], 
-                                           [0, 0, 0, 1]])).type(torch.float32)
-
-        coord_trans_cam = torch.Tensor(np.array([[1, 0, 0, 0], 
-                                                [0, -1, 0, 0], 
-                                                [0, 0, -1, 0], 
-                                                [0, 0, 0, 1]])).type(torch.float32)
-        pose = (coord_trans_world @ torch.Tensor(pose).type(torch.float32) @ coord_trans_cam)    # c2w
+        pose = coord_trans_world @ pose @ coord_trans_cam  
         
-        img_tensor = image_to_tensor(img).type(torch.float32)
-        mask_tensor = mask_to_tensor(mask)
-
-        rows = np.any(mask, axis=1) # [H, 1]
-        cols = np.any(mask, axis=0) # [H, 1]
-        rnz = np.where(rows)[0]
-        cnz = np.where(cols)[0]
-        if len(rnz) == 0:
-            raise RuntimeError(
-                "ERROR: Bad image at", rgb_path, "please investigate!"
-            )
-        rmin, rmax = rnz[[0, -1]]
-        cmin, cmax = cnz[[0, -1]]
-
-        all_imgs.append(img_tensor)
+        all_imgs.append(img)
         all_poses.append(pose)
 
-    imgs = torch.stack(all_imgs, 0)
-    poses = torch.stack(all_poses, 0)
+    imgs = np.stack(all_imgs, 0)
+    poses = np.stack(all_poses, 0)
 
-    render_poses = torch.stack([pose_spherical(angle, -30.0, 2.7) for angle in np.linspace(-180,180,40+1)[:-1]], 0).type(torch.float32)
+    render_poses = torch.stack([pose_spherical(angle, -30.0, 2.7) for angle in np.linspace(-180,180,40+1)[:-1]], 0)
 
     return imgs, poses, render_poses, [H, W, focal]
 
@@ -177,8 +157,8 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
         train_imgs.append(imgs)          # [N, H, W, 3]
         train_poses.append(poses)        # [N, 4, 4]
 
-    train_imgs = torch.stack(train_imgs, 0)      # [O, N, H, W, 3]    
-    train_poses = torch.stack(train_poses, 0)    # [O, N, 4, 4]
+    train_imgs = np.stack(train_imgs, 0)      # [O, N, H, W, 3]    
+    train_poses = np.stack(train_poses, 0)    # [O, N, 4, 4]
 
     return train_imgs, train_poses, hwf, object_list
 
