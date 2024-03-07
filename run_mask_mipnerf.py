@@ -49,7 +49,7 @@ def train(rank, world_size, args):
         i_test = [x for x in np.arange(24-args.mae_input) if x not in i_train]
 
     if args.rand :
-        i_train = random.sample(list(i_train), args.nerf_input)
+        i_train = random.sample(list(range(24)), args.nerf_input)
         i_test = [x for x in np.arange(24) if x not in i_train]
 
     images, poses, render_poses, hwf = load_shapenet(rgb_paths=rgb_paths,
