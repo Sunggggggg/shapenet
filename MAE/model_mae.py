@@ -3,7 +3,7 @@ import torch.nn as nn
 from timm.models.vision_transformer import Block
 
 from .model_vit import ImageEmbed, PatchEmbed
-from .positional_encoding import get_3d_sincos_pos_embed, matrix2angle, view_sinusoid_encoding, get_2d_sincos_pos_embed
+from .positional_encoding import matrix2angle, view_sinusoid_encoding, get_2d_sincos_pos_embed
 
 print_parameters = lambda model : sum(p.numel() for p in model.parameters() if p.requires_grad)
 
