@@ -126,7 +126,7 @@ def train(rank, world_size, args):
         # 1
         nerf_input = args.nerf_input
         mae_input = args.mae_input
-        sampling_pose_function = lambda N : sampling_pose(N, device=rank, dtype=images.dtype)
+        sampling_pose_function = lambda N : sampling_pose(N, device=rank, dtype=torch.cuda.FloatTensor)
     
         i_train = random.sample(list(i_train), nerf_input)
         print("train idx", i_train)
