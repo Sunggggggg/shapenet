@@ -23,6 +23,16 @@ rot_theta = lambda th : torch.Tensor([
     [np.sin(th),0, np.cos(th),0],
     [0,0,0,1]]).float()
 
+coord_trans_world = torch.Tensor(np.array([[1, 0, 0, 0], 
+                                           [0, 0, -1, 0], 
+                                           [0, 1, 0, 0], 
+                                           [0, 0, 0, 1]]))
+
+coord_trans_cam = torch.Tensor(np.array([[1, 0, 0, 0], 
+                                          [0, -1, 0, 0], 
+                                          [0, 0, -1, 0], 
+                                          [0, 0, 0, 1]]))
+
 def pose_spherical(theta, phi, radius):
     c2w = trans_t(radius)
     c2w = rot_phi(phi/180.*np.pi) @ c2w
@@ -76,20 +86,8 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
         else:
             assert abs(fx - focal) < 1e-5
         pose = extr_inv_mtx     # [4, 4]
-
-        _coord_trans_world = torch.tensor([
-        [1, 0, 0, 0], 
-        [0, 0, -1, 0], 
-        [0, 1, 0, 0], 
-        [0, 0, 0, 1]], dtype=torch.float64)
-
-        _coord_trans_cam = torch.tensor([
-            [1, 0, 0, 0], 
-            [0, -1, 0, 0], 
-            [0, 0, -1, 0], 
-            [0, 0, 0, 1]], dtype=torch.float64)
         
-        pose = (_coord_trans_world @ torch.tensor(pose, dtype=torch.float64) @ _coord_trans_cam)    # c2w
+        pose = (coord_trans_world @ torch.Tensor(pose).float() @ coord_trans_cam)    # c2w
         
         img_tensor = image_to_tensor(img).type(torch.float64)
         mask_tensor = mask_to_tensor(mask)
