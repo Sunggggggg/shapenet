@@ -33,9 +33,9 @@ def train(rank, world_size, args):
     near, far = 1.2, 4.0
     data_dir=args.data_dir
     rgb_paths = [x for x in glob.glob(os.path.join(data_dir, 'image', '*'))
-                    if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input]
+                    if (x.endswith('.jpg') or x.endswith('.png'))]
     mask_paths = [x for x in glob.glob(os.path.join(data_dir, 'mask', '*'))
-                if (x.endswith('.jpg') or x.endswith('.png'))][:-args.mae_input] # 0, 1, 2, 3
+                if (x.endswith('.jpg') or x.endswith('.png'))] # 0, 1, 2, 3
     cam_path = os.path.join(data_dir, "cameras.npz")
     
     # 10shot

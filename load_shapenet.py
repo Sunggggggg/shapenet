@@ -144,7 +144,7 @@ def load_nerf_shapenet_data(path, mae_input= 20, stage='train', exp= 1, sel_fix=
         if sel_fix :
             sel_indices = range(num_rgbs-mae_input, num_rgbs)
         else :
-            sel_indices = np.random.choice(len(rgb_paths), mae_input, replace=False)
+            sel_indices = np.random.choice(range(len(rgb_paths)), mae_input, replace=False)
 
         rgb_paths = [rgb_paths[i] for i in sel_indices]     # len : mae_input(20)
         mask_paths = [mask_paths[i] for i in sel_indices]   
