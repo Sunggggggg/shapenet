@@ -45,10 +45,6 @@ def train(rank, world_size, args):
                                                    cam_path=cam_path,
                                                    sel_indices=np.arange(0, 4),
                                                    scale_focal=False)
-    images = images.to(rank)
-    poses = poses.to(rank)
-    render_poses = render_poses.to(rank)
-    print(images.dtype, poses.dtype, render_poses.dtype)
 
     print("Total images : ", images.shape)
     print(i_train, i_test)
@@ -147,7 +143,7 @@ def train(rank, world_size, args):
         for param in encoder.parameters():
             param.requires_grad = False
         
-        train_images, train_poses = images[i_train], poses[i_train]    # [Unmasked_view]
+        train_images, train_poses = torch.tensor(images[i_train]), torch.tensor(poses[i_train])     # [Unmasked_view]
         masked_view_poses = sampling_pose_function(mae_input-nerf_input)
         masked_view_images = torch.zeros((mae_input-nerf_input, *images.shape[1:]))
         all_view_poses = torch.cat([train_poses, masked_view_poses], 0)             # [N, 3, H, W]
@@ -166,6 +162,8 @@ def train(rank, world_size, args):
 
     # Move training data to GPU
     model.train()
+    poses = torch.Tensor(poses).to(rank)
+    render_poses = torch.Tensor(render_poses).to(rank)
 
     for i in trange(start, max_iters):
         # 1. Random select image
@@ -173,8 +171,8 @@ def train(rank, world_size, args):
         pose = poses[img_i, :3,:4]
         target = images[img_i]
 
-        target = target.to(rank)
-        pose = pose.to(rank)
+        target = torch.Tensor(target).to(rank)
+        pose = torch.Tensor(pose).to(rank)
         # 2. Generate rays
         rays_o, rays_d = get_rays(H, W, K, pose)
         radii = get_radii(rays_d)

@@ -9,7 +9,7 @@ def make_input(imgs, fig_path, object_list, n=5, save_fig=True):
     """
     imgs : [O, N, 3, H, W] -> [O, 3, N, H, W]
     """
-    imgs = imgs.transpose(1, 2)
+    imgs = imgs.transpose(0, -1, 1, 2, 3)
 
     if save_fig :
         for idx, _object in enumerate(object_list) :

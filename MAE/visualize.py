@@ -11,7 +11,10 @@ def image_plot(images, emb_type='IMAGE', row=5, save_fig=None):
     images (Tensor)         : [3, N, H, W] 
     images (numpy)          : [3, N, H, W] 
     """
-    images = tensor2img(images.permute(1, 2, 3, 0)) # numpy [N, H, W, 3]
+    if type(images) == torch.Tensor :
+        images = tensor2img(images.permute(1, 2, 3, 0)) # numpy [N, H, W, 3]
+    else :
+        images = images.transpose(1, 2, 3, 0)           # numpy [N, H, W, 3]
 
     N = images.shape[0]
     col = int(N / row)
