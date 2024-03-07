@@ -29,4 +29,3 @@ def set_ddp(rank, world_size):
                             rank=rank, 
                             world_size=world_size)
     setup_for_distributed(rank==0)
-    torch.cuda.set_device(rank)
