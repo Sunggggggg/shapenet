@@ -81,12 +81,12 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
         coord_trans_world = torch.Tensor(np.array([[1, 0, 0, 0], 
                                            [0, 0, -1, 0], 
                                            [0, 1, 0, 0], 
-                                           [0, 0, 0, 1]]))
+                                           [0, 0, 0, 1]])).type(torch.float32)
 
         coord_trans_cam = torch.Tensor(np.array([[1, 0, 0, 0], 
                                                 [0, -1, 0, 0], 
                                                 [0, 0, -1, 0], 
-                                                [0, 0, 0, 1]]))
+                                                [0, 0, 0, 1]])).type(torch.float32)
         pose = (coord_trans_world @ torch.Tensor(pose).type(torch.float32) @ coord_trans_cam)    # c2w
         
         img_tensor = image_to_tensor(img).type(torch.float32)
@@ -109,7 +109,7 @@ def load_shapenet(rgb_paths, mask_paths, cam_path, sel_indices, scale_focal=Fals
     imgs = torch.stack(all_imgs, 0)
     poses = torch.stack(all_poses, 0)
 
-    render_poses = torch.stack([pose_spherical(angle, -30.0, 2.7) for angle in np.linspace(-180,180,40+1)[:-1]], 0)
+    render_poses = torch.stack([pose_spherical(angle, -30.0, 2.7) for angle in np.linspace(-180,180,40+1)[:-1]], 0).type(torch.float32)
 
     return imgs, poses, render_poses, [H, W, focal]
 

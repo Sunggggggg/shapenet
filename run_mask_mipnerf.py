@@ -45,9 +45,9 @@ def train(rank, world_size, args):
                                                    cam_path=cam_path,
                                                    sel_indices=np.arange(0, 4),
                                                    scale_focal=False)
-    images = torch.Tensor(images).to(rank)
-    poses = torch.Tensor(poses).to(rank)
-    render_poses = torch.Tensor(render_poses).to(rank)
+    images = images.to(rank)
+    poses = poses.to(rank)
+    render_poses = render_poses.to(rank)
     print(images.dtype, poses.dtype, render_poses.dtype)
 
     print("Total images : ", images.shape)
@@ -173,8 +173,8 @@ def train(rank, world_size, args):
         pose = poses[img_i, :3,:4]
         target = images[img_i]
 
-        target = torch.Tensor(target).to(rank)
-        pose = torch.Tensor(pose).to(rank)
+        target = target.to(rank)
+        pose = pose.to(rank)
         # 2. Generate rays
         rays_o, rays_d = get_rays(H, W, K, pose)
         radii = get_radii(rays_d)
