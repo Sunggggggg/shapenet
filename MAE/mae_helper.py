@@ -33,7 +33,7 @@ def mae_input_format(imgs, poses, mae_input, emb_type='IMAGE'):
         imgs        [B, 3, Hxn, Wxn]
         poses       [B, N, 4, 4] 
     """
-    imgs = imgs.permute(1, 0, 2, 3).unsqueeze(0)    # [1, 3, N, H, W]
+    imgs = imgs.permute(3, 0, 1, 2).unsqueeze(0)    # [1, 3, N, H, W]
     poses = poses.unsqueeze(0)                      # [1, N, 4, 4]
 
     return imgs, poses
