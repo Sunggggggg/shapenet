@@ -16,7 +16,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from load_shapenet import load_nerf_shapenet_data
 from MAE import make_input, IMAGE_MAE, PATCH_MAE, image_plot, to8b, PRO_MAE, augmenting_images
 
-row = 5
+row = 1
 
 def train(rank, world_size, args):
     print(f"Local gpu id : {rank}, World Size : {world_size}")
